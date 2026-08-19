@@ -28,7 +28,7 @@ export function CommanderPanel() {
   }
 
   return (
-    <div className="flex h-full flex-col rounded-lg border border-border bg-card">
+    <div className="flex h-[460px] flex-col rounded-lg border border-border bg-card">
       <div className="border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold">Urban Resilience Commander</h2>
         <p className="text-xs text-muted-foreground">Ask the City</p>

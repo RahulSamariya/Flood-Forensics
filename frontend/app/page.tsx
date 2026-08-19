@@ -1,37 +1,43 @@
-import { AlertTriangle, MapPin, Shield, TrendingUp } from "lucide-react";
+"use client";
+
+import { AlertTriangle, MapPin, Shield, TrendingUp, DollarSign, Users, FileCheck, Activity } from "lucide-react";
 import { CommanderPanel } from "@/components/dashboard/commander-panel";
 import { IncidentSummary } from "@/components/dashboard/incident-summary";
-import { MapPlaceholder } from "@/components/map/map-placeholder";
+import { FloodMap } from "@/components/map/flood-map";
 import { RecentEvents } from "@/components/dashboard/recent-events";
 import { StatCard } from "@/components/ui/stat-card";
+import { RainfallChart } from "@/components/dashboard/rainfall-chart";
+import { WaterLevelChart } from "@/components/dashboard/water-level-chart";
+import { useDashboardStats } from "@/hooks/use-api";
 
 export default function DashboardPage() {
+  const { data: stats } = useDashboardStats();
+
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4">
       {/* Top stats row */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           label="Active Incidents"
-          value="—"
+          value={stats ? String(stats.active_incidents) : "—"}
           icon={AlertTriangle}
           variant="critical"
-          hint="Phase 2: F2026-001 demo"
         />
         <StatCard
           label="Critical Zones"
-          value="—"
+          value={stats ? String(stats.critical_zones) : "—"}
           icon={MapPin}
           variant="high"
         />
         <StatCard
           label="Resilience Score"
-          value="—"
+          value={stats ? `${stats.resilience_score}%` : "—"}
           icon={Shield}
           variant="default"
         />
         <StatCard
           label="Recurring Hotspots"
-          value="—"
+          value={stats ? String(stats.recurring_hotspots) : "—"}
           icon={TrendingUp}
           variant="medium"
         />
@@ -43,15 +49,17 @@ export default function DashboardPage() {
           <IncidentSummary />
         </aside>
         <main className="lg:col-span-6">
-          <MapPlaceholder />
+          <FloodMap />
         </main>
         <aside className="lg:col-span-3">
           <CommanderPanel />
         </aside>
       </div>
 
-      {/* Bottom panel */}
-      <div className="h-48 shrink-0">
+      {/* Bottom panel — Charts and recent events */}
+      <div className="grid min-h-[220px] grid-cols-1 gap-4 lg:grid-cols-3">
+        <RainfallChart />
+        <WaterLevelChart />
         <RecentEvents />
       </div>
     </div>

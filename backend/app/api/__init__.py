@@ -1,5 +1,3 @@
-"""API package."""
+"""Flood Forensics API package."""
 
-from app.api.router import api_router
-
-__all__ = ["api_router"]
+from app.api import agents, commander, dashboard, drains, events, field_inspections, recommendations, roads

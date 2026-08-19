@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             DEMO DATA
           </span>
           <span className="hidden text-xs text-muted-foreground sm:inline">
-            Phase 1 — Architecture
+            Phase 4 — Dashboard
           </span>
         </div>
       </header>

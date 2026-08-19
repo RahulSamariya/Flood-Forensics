@@ -1,11 +1,13 @@
-"""Drain network endpoints (Phase 3)."""
+"""Drain network endpoints (Phase 3) — returns demo data."""
 
 from fastapi import APIRouter
+
+from app.services.demo_data import DRAINS
 
 router = APIRouter(prefix="/drains")
 
 
 @router.get("")
 async def list_drains() -> list[dict]:
-    """List drainage network nodes. Populated in Phase 2/3."""
-    return []
+    """List all drainage network nodes."""
+    return DRAINS

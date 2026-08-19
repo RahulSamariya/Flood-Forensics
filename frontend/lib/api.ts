@@ -32,6 +32,10 @@ export const api = {
   health: () =>
     request<{ status: string; version: string; ai_provider: string }>("/health"),
 
+  dashboard: {
+    stats: () => request<DashboardStats>("/api/dashboard/stats"),
+  },
+
   events: {
     list: () => request<FloodEventSummary[]>("/api/events"),
     get: (id: string) => request<FloodEventDetail>(`/api/events/${id}`),
@@ -48,6 +52,27 @@ export const api = {
         method: "POST",
         body: JSON.stringify(payload),
       }),
+  },
+
+  rainfall: {
+    list: (stationId?: string) => {
+      const qs = stationId ? `?station_id=${stationId}` : "";
+      return request<RainfallReading[]>(`/api/rainfall${qs}`);
+    },
+  },
+
+  waterLevels: {
+    list: (stationId?: string) => {
+      const qs = stationId ? `?station_id=${stationId}` : "";
+      return request<WaterLevelReading[]>(`/api/water-levels${qs}`);
+    },
+  },
+
+  citizenReports: {
+    list: (eventId?: string) => {
+      const qs = eventId ? `?event_id=${eventId}` : "";
+      return request<CitizenReport[]>(`/api/citizen-reports${qs}`);
+    },
   },
 
   drains: {
@@ -68,11 +93,15 @@ export const api = {
 
 // Re-export types used by API client
 import type {
+  CitizenReport,
   CommanderResponse,
+  DashboardStats,
   DrainNode,
   FloodEventDetail,
   FloodEventSummary,
+  RainfallReading,
   Recommendation,
   ReconstructResponse,
   RoadSegment,
+  WaterLevelReading,
 } from "@/types";

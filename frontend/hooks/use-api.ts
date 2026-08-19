@@ -45,6 +45,38 @@ export function useHealth() {
   return useApi(() => api.health());
 }
 
+export function useDashboardStats() {
+  return useApi(useCallback(() => api.dashboard.stats(), []));
+}
+
 export function useEvents() {
-  return useApi(() => api.events.list());
+  return useApi(useCallback(() => api.events.list(), []));
+}
+
+export function useEvent(id: string) {
+  return useApi(useCallback(() => api.events.get(id), [id]));
+}
+
+export function useRainfall() {
+  return useApi(useCallback(() => api.rainfall.list(), []));
+}
+
+export function useWaterLevels() {
+  return useApi(useCallback(() => api.waterLevels.list(), []));
+}
+
+export function useCitizenReports(eventId?: string) {
+  return useApi(useCallback(() => api.citizenReports.list(eventId), [eventId]));
+}
+
+export function useDrains() {
+  return useApi(useCallback(() => api.drains.list(), []));
+}
+
+export function useRoads() {
+  return useApi(useCallback(() => api.roads.list(), []));
+}
+
+export function useRecommendations(eventId?: string) {
+  return useApi(useCallback(() => api.recommendations.list(eventId), [eventId]));
 }

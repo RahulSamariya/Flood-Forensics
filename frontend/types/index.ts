@@ -7,6 +7,25 @@ export interface Evidence {
   value?: string | number | null;
 }
 
+// ---------------------------------------------------------------------------
+// Dashboard
+// ---------------------------------------------------------------------------
+
+export interface DashboardStats {
+  active_incidents: number;
+  total_events: number;
+  critical_zones: number;
+  resilience_score: number;
+  recurring_hotspots: number;
+  total_damage_cost: number;
+  total_recommendations: number;
+  total_citizen_reports: number;
+}
+
+// ---------------------------------------------------------------------------
+// Flood Events
+// ---------------------------------------------------------------------------
+
 export interface FloodEventSummary {
   event_id: string;
   event_date: string;
@@ -26,6 +45,56 @@ export interface FloodEventDetail extends FloodEventSummary {
   affected_population?: number | null;
   confidence?: number | null;
 }
+
+// ---------------------------------------------------------------------------
+// Rainfall & Water Levels
+// ---------------------------------------------------------------------------
+
+export interface RainfallReading {
+  id: string;
+  timestamp: string;
+  station_id: string;
+  latitude: number;
+  longitude: number;
+  rainfall_mm: number;
+  duration_minutes: number;
+  rainfall_intensity_mm_hr: number;
+  source: string;
+}
+
+export interface WaterLevelReading {
+  id: string;
+  timestamp: string;
+  station_id: string;
+  latitude: number;
+  longitude: number;
+  water_level_m: number;
+  danger_level_m: number;
+  flow_rate_m3_s: number;
+  status: string;
+}
+
+// ---------------------------------------------------------------------------
+// Citizen Reports
+// ---------------------------------------------------------------------------
+
+export interface CitizenReport {
+  report_id: string;
+  event_id: string;
+  timestamp: string;
+  latitude: number;
+  longitude: number;
+  description: string;
+  water_depth_cm: number;
+  severity: string;
+  image_url?: string | null;
+  verification_status: string;
+  confidence: number;
+}
+
+// ---------------------------------------------------------------------------
+// Agent Responses
+// ---------------------------------------------------------------------------
 
 export interface ReconstructResponse {
   event_id: string;
@@ -97,13 +166,23 @@ export interface AgentFinding {
   confidence: number;
 }
 
+// ---------------------------------------------------------------------------
+// Infrastructure
+// ---------------------------------------------------------------------------
+
 export interface DrainNode {
   drain_id: string;
   latitude: number;
   longitude: number;
   drain_type: string;
+  capacity_m3_s?: number;
+  diameter_mm?: number;
+  depth_m?: number;
+  length_m?: number;
   condition_score?: number;
   blockage_percent?: number;
+  last_cleaned?: string;
+  installation_year?: number;
 }
 
 export interface RoadSegment {
@@ -111,7 +190,11 @@ export interface RoadSegment {
   name: string;
   road_type: string;
   importance: string;
+  length_m?: number;
+  elevation?: number;
   flood_threshold_cm?: number;
+  traffic_level?: string;
+  criticality?: string;
 }
 
 export interface Recommendation {
@@ -126,6 +209,10 @@ export interface Recommendation {
   confidence: number;
   status: string;
 }
+
+// ---------------------------------------------------------------------------
+// Agent Pipeline Definition
+// ---------------------------------------------------------------------------
 
 export interface AgentDefinition {
   name: string;
