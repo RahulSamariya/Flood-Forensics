@@ -42,9 +42,12 @@ async def analyze_recurrence(
 
 
 @router.post("/permanent-fix", response_model=PermanentFixResponse)
-async def analyze_permanent_fix(body: PermanentFixRequest) -> PermanentFixResponse:
+async def analyze_permanent_fix(
+    body: PermanentFixRequest,
+    session: AsyncSession = Depends(get_db),
+) -> PermanentFixResponse:
     agent = PermanentFixAgent(get_ai_provider())
-    return await agent.analyze(body.event_id)
+    return await agent.analyze(body.event_id, session)
 
 
 @router.post("/field-verification", response_model=FieldVerificationResponse)
