@@ -89,6 +89,62 @@ export interface CommanderResponse {
   agent_findings: AgentFinding[];
 }
 
+export interface RootCauseResponse {
+  event_id: string;
+  status: AgentStatus;
+  ranked_causes: RankedCause[];
+  confidence: number;
+}
+
+export interface RecurrenceResponse {
+  event_id: string;
+  status: AgentStatus;
+  flood_dna?: FloodDNA | null;
+  similar_events: SimilarEvent[];
+  confidence: number;
+}
+
+export interface SimilarEvent {
+  event_id: string;
+  event_date: string;
+  severity: string;
+  water_depth_cm?: number | null;
+  similarity_score: number;
+  shared_factors: string[];
+}
+
+export interface PermanentFixResponse {
+  event_id: string;
+  status: AgentStatus;
+  immediate_response: Intervention[];
+  permanent_interventions: Intervention[];
+  confidence: number;
+}
+
+export interface FieldVerificationResponse {
+  inspection_id: string;
+  status: AgentStatus;
+  verification_status: string;
+  blockage_before?: number | null;
+  blockage_after?: number | null;
+  findings: string[];
+  confidence: number;
+  allow_human_override: boolean;
+}
+
+export interface FieldInspectionCreatePayload {
+  work_id?: string | null;
+  drain_id: string;
+  inspector_id: string;
+  latitude: number;
+  longitude: number;
+  image_before?: string | null;
+  image_after?: string | null;
+  blockage_before?: number | null;
+  blockage_after?: number | null;
+  notes?: string | null;
+}
+
 export interface AgentFinding {
   agent_name: string;
   finding_type: string;
@@ -111,7 +167,75 @@ export interface RoadSegment {
   name: string;
   road_type: string;
   importance: string;
+  length_m?: number;
+  elevation?: number;
   flood_threshold_cm?: number;
+  traffic_level?: string;
+  criticality?: string;
+}
+
+export interface RainfallReading {
+  id: number;
+  timestamp: string;
+  station_id: string;
+  rainfall_mm: number;
+  duration_minutes: number;
+  rainfall_intensity_mm_hr: number;
+  source: string;
+}
+
+export interface WaterLevelReading {
+  id: number;
+  timestamp: string;
+  station_id: string;
+  water_level_m: number;
+  danger_level_m: number;
+  status: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface CitizenReport {
+  report_id: string;
+  event_id?: string | null;
+  timestamp: string;
+  latitude: number;
+  longitude: number;
+  description: string;
+  water_depth_cm?: number | null;
+  severity: string;
+  verification_status: string;
+  confidence: number;
+}
+
+export interface ResponseAction {
+  action_id: string;
+  event_id?: string | null;
+  action_type: string;
+  timestamp?: string | null;
+  location?: string | null;
+  team_id?: string | null;
+  status: string;
+  effectiveness?: string | null;
+}
+
+export interface FieldInspection {
+  inspection_id: string;
+  work_id?: string | null;
+  drain_id: string;
+  inspector_id: string;
+  timestamp?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  image_before?: string | null;
+  image_after?: string | null;
+  blockage_before?: number | null;
+  blockage_after?: number | null;
+  condition_before?: number | null;
+  condition_after?: number | null;
+  ai_verification_score?: number | null;
+  verification_status: string;
+  notes: string;
 }
 
 export interface Recommendation {

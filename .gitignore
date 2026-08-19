@@ -29,6 +29,7 @@ build/
 frontend/.next/
 frontend/out/
 frontend/.vercel
+frontend/*.tsbuildinfo
 
 # IDE
 .idea/

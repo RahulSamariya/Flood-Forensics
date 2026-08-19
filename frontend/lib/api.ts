@@ -35,6 +35,14 @@ export const api = {
   events: {
     list: () => request<FloodEventSummary[]>("/api/events"),
     get: (id: string) => request<FloodEventDetail>(`/api/events/${id}`),
+    rainfall: (id: string) =>
+      request<RainfallReading[]>(`/api/events/${id}/rainfall`),
+    waterLevels: (id: string) =>
+      request<WaterLevelReading[]>(`/api/events/${id}/water-levels`),
+    reports: (id: string) =>
+      request<CitizenReport[]>(`/api/events/${id}/reports`),
+    responseActions: (id: string) =>
+      request<ResponseAction[]>(`/api/events/${id}/response-actions`),
     reconstruct: (id: string) =>
       request<ReconstructResponse>(`/api/events/${id}/reconstruct`, {
         method: "POST",
@@ -47,6 +55,29 @@ export const api = {
       request<CommanderResponse>("/api/commander/analyze", {
         method: "POST",
         body: JSON.stringify(payload),
+      }),
+  },
+
+  agents: {
+    rootCause: (eventId: string) =>
+      request<RootCauseResponse>("/api/agents/root-cause", {
+        method: "POST",
+        body: JSON.stringify({ event_id: eventId }),
+      }),
+    recurrence: (eventId: string) =>
+      request<RecurrenceResponse>("/api/agents/recurrence", {
+        method: "POST",
+        body: JSON.stringify({ event_id: eventId }),
+      }),
+    permanentFix: (eventId: string) =>
+      request<PermanentFixResponse>("/api/agents/permanent-fix", {
+        method: "POST",
+        body: JSON.stringify({ event_id: eventId }),
+      }),
+    fieldVerification: (inspectionId: string) =>
+      request<FieldVerificationResponse>("/api/agents/field-verification", {
+        method: "POST",
+        body: JSON.stringify({ inspection_id: inspectionId }),
       }),
   },
 
@@ -64,15 +95,34 @@ export const api = {
       return request<Recommendation[]>(`/api/recommendations${qs}`);
     },
   },
+
+  fieldInspections: {
+    list: () => request<FieldInspection[]>("/api/field-inspections"),
+    create: (payload: FieldInspectionCreatePayload) =>
+      request<FieldInspection>("/api/field-inspections", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+  },
 };
 
 // Re-export types used by API client
 import type {
+  CitizenReport,
   CommanderResponse,
   DrainNode,
+  FieldInspection,
+  FieldInspectionCreatePayload,
+  FieldVerificationResponse,
   FloodEventDetail,
   FloodEventSummary,
+  PermanentFixResponse,
+  RainfallReading,
   Recommendation,
   ReconstructResponse,
+  RecurrenceResponse,
+  ResponseAction,
   RoadSegment,
+  RootCauseResponse,
+  WaterLevelReading,
 } from "@/types";
