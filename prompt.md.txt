@@ -1,0 +1,887 @@
+You are the lead full-stack engineer building a hackathon project called "Flood Forensics".
+
+IMPORTANT:
+Do NOT create a generic flood dashboard.
+Do NOT build a chatbot-only application.
+Do NOT over-engineer with microservices.
+Do NOT use mock AI responses once the backend is connected.
+Build a clean, production-quality MVP that can be demonstrated end-to-end.
+
+==================================================
+PROJECT
+==================================================
+
+Flood Forensics is an agentic urban flood investigation and resilience platform.
+
+The system investigates flooding AFTER or DURING an event and answers:
+
+1. What happened?
+2. Why did it happen?
+3. Has this happened before?
+4. What permanent intervention should be made?
+5. Did the intervention actually work?
+6. What should the city do next?
+
+The core differentiator is:
+
+FLOOD EVENT
+→ EVENT RECONSTRUCTION
+→ ROOT CAUSE
+→ RECURRENCE ANALYSIS
+→ PERMANENT FIX
+→ FIELD VERIFICATION
+→ URBAN RESILIENCE IMPROVEMENT
+
+The product should feel like a professional municipal emergency/intelligence command center, NOT a consumer weather app.
+
+==================================================
+TECH STACK
+==================================================
+
+Frontend:
+- Next.js
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Lucide icons
+- Mapbox GL JS or react-map-gl
+- Recharts for analytics
+
+Backend:
+- Python
+- FastAPI
+- Pydantic
+- SQLAlchemy where appropriate
+
+Database:
+- Supabase PostgreSQL
+- PostGIS for geospatial data
+- Supabase Storage for images/evidence
+- Supabase Auth if authentication is needed
+
+AI:
+- Design the architecture so IBM watsonx / Granite can be plugged into the agents.
+- Create a clean AI provider abstraction.
+- Do NOT hard-code the application around one AI provider.
+- For local development, provide a safe mock provider.
+
+Data/analysis:
+- Pandas
+- NumPy
+- GeoPandas where useful
+- NetworkX for drainage graph analysis
+
+Deployment:
+- Frontend should be deployable to Vercel.
+- Backend should be deployable independently.
+
+==================================================
+PROJECT STRUCTURE
+==================================================
+
+Create:
+
+flood-forensics/
+
+frontend/
+  app/
+  components/
+  lib/
+  hooks/
+  types/
+  public/
+
+backend/
+  app/
+    main.py
+    api/
+    agents/
+    services/
+    models/
+    schemas/
+    core/
+    utils/
+  tests/
+
+supabase/
+  migrations/
+  seed/
+
+data/
+  rainfall/
+  flood_events/
+  drains/
+  maintenance/
+  water_levels/
+  citizen_reports/
+  field_inspections/
+
+docs/
+
+.env.example
+README.md
+
+==================================================
+DATABASE
+==================================================
+
+Create a Supabase/PostgreSQL schema for:
+
+1. flood_events
+
+Fields:
+- event_id
+- event_date
+- end_date
+- city
+- zone_id
+- latitude
+- longitude
+- severity
+- water_depth_cm
+- duration_minutes
+- affected_area_km2
+- affected_population
+- source
+- confidence
+- created_at
+
+2. rainfall
+
+Fields:
+- id
+- timestamp
+- station_id
+- latitude
+- longitude
+- rainfall_mm
+- duration_minutes
+- rainfall_intensity_mm_hr
+- source
+
+3. water_levels
+
+Fields:
+- id
+- timestamp
+- station_id
+- latitude
+- longitude
+- water_level_m
+- danger_level_m
+- flow_rate_m3_s
+- status
+
+4. drains
+
+Fields:
+- drain_id
+- latitude
+- longitude
+- drain_type
+- capacity_m3_s
+- diameter_mm
+- depth_m
+- length_m
+- condition_score
+- blockage_percent
+- last_cleaned
+- installation_year
+
+5. drain_connections
+
+Fields:
+- connection_id
+- from_drain_id
+- to_drain_id
+- flow_direction
+- distance_m
+- capacity_m3_s
+
+6. maintenance_records
+
+Fields:
+- work_id
+- drain_id
+- reported_date
+- scheduled_date
+- completed_date
+- issue_type
+- issue_description
+- action_taken
+- status
+- reported_blockage_percent
+- completion_blockage_percent
+- verification_status
+
+7. citizen_reports
+
+Fields:
+- report_id
+- event_id
+- timestamp
+- latitude
+- longitude
+- description
+- water_depth_cm
+- severity
+- image_url
+- verification_status
+- confidence
+
+8. field_inspections
+
+Fields:
+- inspection_id
+- work_id
+- drain_id
+- inspector_id
+- timestamp
+- latitude
+- longitude
+- image_before
+- image_after
+- blockage_before
+- blockage_after
+- condition_before
+- condition_after
+- ai_verification_score
+- verification_status
+- notes
+
+9. roads
+
+Fields:
+- road_id
+- name
+- road_type
+- importance
+- length_m
+- elevation
+- flood_threshold_cm
+- traffic_level
+- criticality
+
+10. response_actions
+
+Fields:
+- action_id
+- event_id
+- action_type
+- timestamp
+- location
+- team_id
+- status
+- completion_time
+- effectiveness
+
+11. damage_reports
+
+Fields:
+- damage_id
+- event_id
+- location
+- damage_type
+- severity
+- estimated_cost
+- image_url
+- verified
+
+12. agent_runs
+
+Fields:
+- id
+- event_id
+- agent_name
+- status
+- started_at
+- completed_at
+- confidence
+- output
+
+13. agent_findings
+
+Fields:
+- id
+- event_id
+- agent_name
+- finding_type
+- finding
+- evidence
+- confidence
+- created_at
+
+14. recommendations
+
+Fields:
+- id
+- event_id
+- recommendation_type
+- title
+- description
+- estimated_cost
+- expected_risk_reduction
+- priority
+- confidence
+- status
+
+Use PostGIS for relevant location fields.
+
+==================================================
+SIX AGENTS
+==================================================
+
+Implement the agents as modular Python services.
+
+DO NOT make six independent applications.
+
+Use:
+
+backend/app/agents/
+
+event_reconstructor.py
+root_cause.py
+recurrence.py
+permanent_fix.py
+field_verification.py
+commander.py
+
+--------------------------------------------------
+1. EVENT RECONSTRUCTOR
+--------------------------------------------------
+
+Input:
+- flood event
+- rainfall
+- water levels
+- citizen reports
+- response actions
+
+Output:
+- reconstructed timeline
+- affected locations
+- severity
+- evidence
+- confidence
+
+Example:
+
+14:00 Rain begins
+14:18 Rainfall intensity increases
+14:31 Water level critical
+14:37 Citizen report
+14:42 Road flooded
+15:05 Emergency response
+16:20 Water recedes
+
+--------------------------------------------------
+2. ROOT CAUSE AGENT
+--------------------------------------------------
+
+Investigate possible causes:
+
+- excessive rainfall
+- drainage blockage
+- insufficient capacity
+- low elevation
+- pump failure
+- downstream obstruction
+- maintenance failure
+
+Do NOT return a single unexplained answer.
+
+Return ranked causes:
+
+cause
+probability/confidence
+supporting evidence
+contradicting evidence
+explanation
+
+Example:
+
+Drain D142 blockage — 71%
+Drain capacity — 18%
+Pump failure — 7%
+Other — 4%
+
+--------------------------------------------------
+3. RECURRENCE AGENT
+--------------------------------------------------
+
+Find historical events with similar:
+
+- location
+- rainfall
+- duration
+- water level
+- drainage conditions
+- causes
+
+Calculate a similarity score.
+
+Generate a "Flood DNA" profile:
+
+- rainfall threshold
+- critical duration
+- common causes
+- recurrence count
+- average recovery time
+- vulnerable infrastructure
+
+--------------------------------------------------
+4. PERMANENT FIX AGENT
+--------------------------------------------------
+
+Generate 2–3 possible interventions.
+
+For each:
+
+- intervention
+- estimated cost
+- expected risk reduction
+- implementation time
+- priority
+- confidence
+
+Separate:
+
+IMMEDIATE RESPONSE
+from
+PERMANENT INTERVENTION
+
+Include cost-vs-impact comparison.
+
+--------------------------------------------------
+5. FIELD VERIFICATION AGENT
+--------------------------------------------------
+
+Accept before/after inspection images.
+
+Analyze:
+
+- blockage
+- debris
+- standing water
+- drain condition
+- visible infrastructure damage
+
+Compare:
+
+before blockage %
+after blockage %
+
+Return:
+
+VERIFIED
+PARTIALLY VERIFIED
+VERIFICATION FAILED
+
+Always allow human override.
+
+--------------------------------------------------
+6. URBAN RESILIENCE COMMANDER
+--------------------------------------------------
+
+The Commander orchestrates the other agents.
+
+It should NOT invent facts.
+
+It should collect evidence from the agents and produce:
+
+- incident brief
+- primary cause
+- supporting evidence
+- recurrence information
+- recommended intervention
+- verification status
+- resilience score
+- confidence
+
+Also provide a natural-language query interface.
+
+Examples:
+
+"Why did J18 flood?"
+
+"Has this happened before?"
+
+"What should we fix first?"
+
+"Which locations have the highest recurrence risk?"
+
+==================================================
+FRONTEND
+==================================================
+
+Build a professional municipal command center.
+
+Design principles:
+
+- mature
+- clean
+- information dense
+- modern
+- restrained
+- accessible
+- desktop-first
+- responsive
+- no excessive gradients
+- no excessive glassmorphism
+- no childish illustrations
+
+Use a dark professional dashboard aesthetic with clear severity indicators.
+
+==================================================
+PAGES
+==================================================
+
+1. DASHBOARD
+
+Show:
+
+- active flood incidents
+- critical incidents
+- recurring hotspots
+- resilience score
+- AI recommendations
+- recent events
+- live/interactive map
+
+Main visual hierarchy:
+
+LEFT:
+Incident summary
+
+CENTER:
+Large interactive map
+
+RIGHT:
+Urban Resilience Commander
+
+BOTTOM:
+Recent events / recommendations / recurrence statistics
+
+--------------------------------------------------
+
+2. FLOOD EVENT INVESTIGATION
+
+Show:
+
+- event summary
+- timeline
+- rainfall graph
+- water-level graph
+- affected map
+- evidence
+- root cause
+- confidence
+
+Include a "Replay Event" control.
+
+--------------------------------------------------
+
+3. MAP
+
+Layers:
+
+- flood events
+- drainage
+- roads
+- water levels
+- hotspots
+- critical infrastructure
+
+Allow toggling layers.
+
+--------------------------------------------------
+
+4. RECURRENCE
+
+Show:
+
+- recurring flood locations
+- flood DNA
+- historical comparison
+- similar events
+- recurrence score
+
+--------------------------------------------------
+
+5. PERMANENT FIXES
+
+Show:
+
+- recommended interventions
+- cost
+- expected risk reduction
+- priority
+- implementation time
+
+Include a cost-vs-impact chart.
+
+--------------------------------------------------
+
+6. FIELD VERIFICATION
+
+Show:
+
+- pending inspections
+- before image
+- after image
+- AI analysis
+- verification result
+- human approval
+
+--------------------------------------------------
+
+7. AGENT CONSOLE
+
+Visually show:
+
+Event Reconstructor → Root Cause → Recurrence → Permanent Fix → Field Verification → Commander
+
+Display each agent's:
+
+- status
+- evidence
+- findings
+- confidence
+
+==================================================
+SIGNATURE FEATURES
+==================================================
+
+Build these especially well:
+
+1. Flood Timeline Reconstruction
+
+2. Causal Chain
+
+Rainfall
+↓
+Drain blockage
+↓
+Capacity exceeded
+↓
+Water accumulation
+↓
+Road flooding
+
+3. Flood DNA
+
+4. Similar Event Search
+
+5. Permanent Fix Recommendation
+
+6. Before/After Field Verification
+
+7. City Resilience Score
+
+8. "What If We Do Nothing?" simulation
+
+9. Natural-language "Ask the City"
+
+10. Evidence-backed AI explanations
+
+==================================================
+AI DESIGN
+==================================================
+
+Create:
+
+backend/app/services/ai_provider.py
+
+Interface:
+
+AIProvider
+
+Methods should support:
+
+- generate_text()
+- analyze_evidence()
+- analyze_image()
+- summarize()
+- recommend()
+
+Create:
+
+MockAIProvider
+GraniteAIProvider
+
+The application should work with MockAIProvider if IBM credentials are unavailable.
+
+When watsonx/Granite credentials are provided, allow switching through environment variables.
+
+Example:
+
+AI_PROVIDER=mock
+
+or
+
+AI_PROVIDER=granite
+
+Never expose API keys to the frontend.
+
+==================================================
+IMPORTANT AI RULE
+==================================================
+
+The AI must not fabricate evidence.
+
+Every finding must contain:
+
+- finding
+- evidence
+- confidence
+- source references
+
+If data is insufficient, the agent should say:
+
+"Insufficient evidence."
+
+==================================================
+DEMO DATA
+==================================================
+
+Create realistic but clearly labeled DEMO/SIMULATED data.
+
+Do NOT represent generated data as real government data.
+
+Create one complete demonstration event:
+
+F2026-001
+
+The event should have:
+
+- rainfall spike
+- water-level increase
+- drain blockage
+- maintenance record
+- citizen report
+- road impact
+- response action
+- field inspection
+- recommended permanent fix
+
+Make the data internally consistent so the agents can actually reason over it.
+
+==================================================
+API
+==================================================
+
+Create endpoints:
+
+GET /api/events
+GET /api/events/{event_id}
+POST /api/events/{event_id}/reconstruct
+
+POST /api/agents/root-cause
+POST /api/agents/recurrence
+POST /api/agents/permanent-fix
+POST /api/agents/field-verification
+
+POST /api/commander/analyze
+
+GET /api/drains
+GET /api/roads
+GET /api/recommendations
+
+POST /api/field-inspections
+
+==================================================
+SECURITY
+==================================================
+
+- Environment variables for secrets
+- Never commit .env
+- Provide .env.example
+- Validate API input
+- Do not expose Supabase service-role credentials to frontend
+- Add basic authentication structure
+- Add error handling
+- Add CORS configuration
+
+==================================================
+QUALITY
+==================================================
+
+Use:
+
+- TypeScript strict mode
+- Python type hints
+- Pydantic schemas
+- clear interfaces
+- reusable UI components
+- loading states
+- error states
+- empty states
+- responsive design
+- meaningful comments only where needed
+
+Avoid:
+
+- duplicated code
+- giant components
+- hardcoded API responses
+- fake AI outputs hidden as real AI
+- unnecessary dependencies
+- microservices
+- overengineering
+
+==================================================
+DEVELOPMENT METHOD
+==================================================
+
+IMPORTANT:
+
+Do not build the entire project in one giant operation.
+
+Work in phases.
+
+PHASE 1:
+Create architecture and repository structure.
+
+PHASE 2:
+Create database schema and seed data.
+
+PHASE 3:
+Create FastAPI backend and database connection.
+
+PHASE 4:
+Create frontend shell and dashboard.
+
+PHASE 5:
+Implement Event Reconstructor.
+
+PHASE 6:
+Implement Root Cause Agent.
+
+PHASE 7:
+Implement Recurrence Agent.
+
+PHASE 8:
+Implement Permanent Fix Agent.
+
+PHASE 9:
+Implement Field Verification.
+
+PHASE 10:
+Implement Urban Resilience Commander.
+
+PHASE 11:
+Integrate IBM Granite/watsonx.
+
+PHASE 12:
+Testing, polish and deployment.
+
+After every phase:
+- run tests
+- check for errors
+- do not break existing functionality
+- summarize what changed
+- list remaining work
+
+START WITH PHASE 1 ONLY.
+Do not implement all phases immediately.
+First inspect the environment and create the architecture.

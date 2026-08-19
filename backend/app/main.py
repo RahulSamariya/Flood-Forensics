@@ -1,0 +1,53 @@
+"""Flood Forensics FastAPI application entry point."""
+
+from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.router import api_router
+from app.core.config import get_settings
+from app.schemas import HealthResponse
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    settings = get_settings()
+    if not settings.database_url:
+        print("[WARN] DATABASE_URL not set — running without database (Phase 1/2).")
+    yield
+
+
+def create_app() -> FastAPI:
+    settings = get_settings()
+
+    app = FastAPI(
+        title="Flood Forensics API",
+        description="Agentic urban flood investigation and resilience platform",
+        version="0.1.0",
+        lifespan=lifespan,
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/health", response_model=HealthResponse, tags=["health"])
+    async def health_check() -> HealthResponse:
+        return HealthResponse(
+            status="ok",
+            version="0.1.0",
+            ai_provider=settings.ai_provider,
+        )
+
+    app.include_router(api_router)
+
+    return app
+
+
+app = create_app()

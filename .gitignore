@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/.vercel
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Supabase
+supabase/.temp/
+
+# Data (large files — keep structure, ignore raw dumps)
+data/**/*.csv
+data/**/*.geojson
+data/**/*.parquet
+!data/**/.gitkeep
+
+# Test / coverage
+coverage/
+htmlcov/
+.coverage

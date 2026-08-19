@@ -1,0 +1,2 @@
+-- F2026-001 demo seed data (Phase 2)
+-- All data clearly labeled DEMO/SIMULATED.

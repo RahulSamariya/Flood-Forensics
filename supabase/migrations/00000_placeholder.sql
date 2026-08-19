@@ -1,0 +1,2 @@
+-- Flood Forensics database migrations (Phase 2)
+-- PostGIS-enabled schema for 14 tables will be added here.
