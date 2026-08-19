@@ -41,6 +41,7 @@ export interface TimelineEntry {
   timestamp: string;
   event: string;
   source?: string;
+  severity?: string;
 }
 
 export interface AffectedLocation {
