@@ -1,5 +1,7 @@
 """Recurrence agent — Flood DNA and similar event search (Phase 7)."""
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.schemas import AgentStatus, RecurrenceResponse
 from app.services.ai_provider import AIProvider
 
@@ -12,7 +14,7 @@ class RecurrenceAgent:
     def __init__(self, ai: AIProvider) -> None:
         self._ai = ai
 
-    async def analyze(self, event_id: str) -> RecurrenceResponse:
+    async def analyze(self, event_id: str, session: AsyncSession) -> RecurrenceResponse:
         return RecurrenceResponse(
             event_id=event_id,
             status=AgentStatus.PENDING,

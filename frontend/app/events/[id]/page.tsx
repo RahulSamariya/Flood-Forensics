@@ -2,6 +2,7 @@ import { api } from "@/lib/api";
 import { TimelineReplay } from "@/components/events/timeline-replay";
 import { RainfallChart, WaterLevelChart } from "@/components/events/event-charts";
 import { EventEvidence } from "@/components/events/event-evidence";
+import { RootCausePanel } from "@/components/events/root-cause-panel";
 import { cn } from "@/lib/utils";
 
 const SEVERITY_BADGE: Record<string, string> = {
@@ -61,7 +62,7 @@ export default async function EventInvestigationPage({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <EventEvidence eventId={id} />
+          <RootCausePanel eventId={id} />
         </div>
         <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 text-sm">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">

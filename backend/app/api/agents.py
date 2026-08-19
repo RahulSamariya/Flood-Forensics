@@ -1,11 +1,13 @@
 """Agent endpoints (Phases 5–9)."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.field_verification import FieldVerificationAgent
 from app.agents.permanent_fix import PermanentFixAgent
 from app.agents.recurrence import RecurrenceAgent
 from app.agents.root_cause import RootCauseAgent
+from app.core.database import get_db
 from app.schemas import (
     FieldVerificationRequest,
     FieldVerificationResponse,
@@ -22,15 +24,21 @@ router = APIRouter()
 
 
 @router.post("/root-cause", response_model=RootCauseResponse)
-async def analyze_root_cause(body: RootCauseRequest) -> RootCauseResponse:
+async def analyze_root_cause(
+    body: RootCauseRequest,
+    session: AsyncSession = Depends(get_db),
+) -> RootCauseResponse:
     agent = RootCauseAgent(get_ai_provider())
-    return await agent.analyze(body.event_id)
+    return await agent.analyze(body.event_id, session)
 
 
 @router.post("/recurrence", response_model=RecurrenceResponse)
-async def analyze_recurrence(body: RecurrenceRequest) -> RecurrenceResponse:
+async def analyze_recurrence(
+    body: RecurrenceRequest,
+    session: AsyncSession = Depends(get_db),
+) -> RecurrenceResponse:
     agent = RecurrenceAgent(get_ai_provider())
-    return await agent.analyze(body.event_id)
+    return await agent.analyze(body.event_id, session)
 
 
 @router.post("/permanent-fix", response_model=PermanentFixResponse)
