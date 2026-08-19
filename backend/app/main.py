@@ -8,14 +8,22 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.core.config import get_settings
+from app.core.database import get_session_factory, init_db
+from app.core.seed import seed_database
 from app.schemas import HealthResponse
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
-    if not settings.database_url:
-        print("[WARN] DATABASE_URL not set — running without database (Phase 1/2).")
+    await init_db()
+    factory = get_session_factory()
+    async with factory() as session:
+        await seed_database(session)
+    if settings.database_url:
+        print(f"[INFO] Connected to configured database: {settings.database_url.split('@')[-1]}")
+    else:
+        print("[INFO] DATABASE_URL not set — using local SQLite with F2026-001 demo seed.")
     yield
 
 

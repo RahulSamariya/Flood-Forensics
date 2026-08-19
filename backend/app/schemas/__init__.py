@@ -188,3 +188,109 @@ class FieldInspectionCreate(BaseModel):
     blockage_before: float | None = None
     blockage_after: float | None = None
     notes: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 — Infrastructure & Read Models
+# ---------------------------------------------------------------------------
+
+class RainfallReading(BaseModel):
+    id: int
+    timestamp: datetime
+    station_id: str
+    rainfall_mm: float
+    duration_minutes: int
+    rainfall_intensity_mm_hr: float
+    source: str
+
+
+class WaterLevelReading(BaseModel):
+    id: int
+    timestamp: datetime
+    station_id: str
+    water_level_m: float
+    danger_level_m: float
+    status: str
+
+
+class DrainSchema(BaseModel):
+    drain_id: str
+    latitude: float
+    longitude: float
+    drain_type: str
+    capacity_m3_s: float
+    diameter_mm: int | None = None
+    depth_m: float | None = None
+    length_m: float | None = None
+    condition_score: int
+    blockage_percent: float
+    last_cleaned: datetime | None = None
+    installation_year: int | None = None
+
+
+class RoadSchema(BaseModel):
+    road_id: str
+    name: str
+    road_type: str
+    importance: str
+    length_m: float | None = None
+    elevation: float | None = None
+    flood_threshold_cm: float | None = None
+    traffic_level: str
+    criticality: str
+
+
+class RecommendationSchema(BaseModel):
+    id: int
+    event_id: str | None = None
+    recommendation_type: str
+    title: str
+    description: str
+    estimated_cost: float | None = None
+    expected_risk_reduction: float | None = None
+    priority: str
+    confidence: float
+    status: str
+
+
+class FieldInspectionSchema(BaseModel):
+    inspection_id: str
+    work_id: str | None = None
+    drain_id: str
+    inspector_id: str
+    timestamp: datetime | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    image_before: str | None = None
+    image_after: str | None = None
+    blockage_before: float | None = None
+    blockage_after: float | None = None
+    condition_before: int | None = None
+    condition_after: int | None = None
+    ai_verification_score: float | None = None
+    verification_status: str
+    notes: str
+
+
+class CitizenReportSchema(BaseModel):
+    report_id: str
+    event_id: str | None = None
+    timestamp: datetime
+    latitude: float
+    longitude: float
+    description: str
+    water_depth_cm: float | None = None
+    severity: str
+    verification_status: str
+    confidence: float
+
+
+class ResponseActionSchema(BaseModel):
+    action_id: str
+    event_id: str | None = None
+    action_type: str
+    timestamp: datetime | None = None
+    location: str | None = None
+    team_id: str | None = None
+    status: str
+    effectiveness: str | None = None

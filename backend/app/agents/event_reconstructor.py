@@ -1,5 +1,7 @@
 """Event Reconstructor agent — rebuilds flood timeline from multi-source evidence (Phase 5)."""
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.schemas import AgentStatus, ReconstructResponse
 from app.services.ai_provider import AIProvider
 
@@ -12,7 +14,7 @@ class EventReconstructor:
     def __init__(self, ai: AIProvider) -> None:
         self._ai = ai
 
-    async def reconstruct(self, event_id: str) -> ReconstructResponse:
+    async def reconstruct(self, event_id: str, session: AsyncSession | None = None) -> ReconstructResponse:
         # Phase 5: load event data from DB and build timeline
         return ReconstructResponse(
             event_id=event_id,
