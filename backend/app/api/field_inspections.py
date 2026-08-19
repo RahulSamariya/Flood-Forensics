@@ -1,6 +1,7 @@
 """Field inspection endpoints (Phase 3/9)."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +10,26 @@ from app.models import FieldInspection
 from app.schemas import FieldInspectionCreate, FieldInspectionSchema
 
 router = APIRouter(prefix="/field-inspections")
+
+
+class HumanOverrideRequest(BaseModel):
+    verification_status: str = Field(..., pattern="^(verified|partially_verified|verification_failed)$")
+
+
+@router.post("/{inspection_id}/override", response_model=FieldInspectionSchema)
+async def override_field_inspection(
+    inspection_id: str,
+    body: HumanOverrideRequest,
+    session: AsyncSession = Depends(get_db),
+) -> FieldInspectionSchema:
+    """Human override of an AI verification verdict."""
+    inspection = await session.get(FieldInspection, inspection_id)
+    if not inspection:
+        raise HTTPException(status_code=404, detail=f"Inspection {inspection_id} not found.")
+    inspection.verification_status = body.verification_status
+    await session.commit()
+    await session.refresh(inspection)
+    return FieldInspectionSchema.model_validate(inspection, from_attributes=True)
 
 
 def _next_inspection_id(existing: list[str]) -> str:

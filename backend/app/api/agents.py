@@ -51,6 +51,9 @@ async def analyze_permanent_fix(
 
 
 @router.post("/field-verification", response_model=FieldVerificationResponse)
-async def verify_field_inspection(body: FieldVerificationRequest) -> FieldVerificationResponse:
+async def verify_field_inspection(
+    body: FieldVerificationRequest,
+    session: AsyncSession = Depends(get_db),
+) -> FieldVerificationResponse:
     agent = FieldVerificationAgent(get_ai_provider())
-    return await agent.verify(body.inspection_id)
+    return await agent.verify(body.inspection_id, session)

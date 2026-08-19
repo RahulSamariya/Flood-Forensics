@@ -103,6 +103,11 @@ export const api = {
         method: "POST",
         body: JSON.stringify(payload),
       }),
+    override: (inspectionId: string, verificationStatus: string) =>
+      request<FieldInspection>(`/api/field-inspections/${inspectionId}/override`, {
+        method: "POST",
+        body: JSON.stringify({ verification_status: verificationStatus }),
+      }),
   },
 };
 
