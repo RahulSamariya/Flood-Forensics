@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     watsonx_project_id: str = ""
     watsonx_url: str = "https://us-south.ml.cloud.ibm.com"
     watsonx_model: str = "ibm/granite-3-8b-instruct"
+    watsonx_vision_model: str = "ibm/granite-vision-3-4"
 
     @property
     def cors_origins(self) -> list[str]:
