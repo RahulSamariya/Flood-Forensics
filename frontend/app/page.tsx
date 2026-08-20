@@ -8,15 +8,24 @@ import { RecentEvents } from "@/components/dashboard/recent-events";
 import { StatCard } from "@/components/ui/stat-card";
 import { useApi } from "@/hooks/use-api";
 import { api } from "@/lib/api";
+import { useMemo } from "react";
 
 export default function DashboardPage() {
   const events = useApi(() => api.events.list());
-  const recommendations = useApi(() => api.recommendations.list("F2026-001"));
+  const commander = useApi(() =>
+    api.commander.analyze({ event_id: "F2026-001" }),
+  );
 
   const activeCount = events.data?.length ?? 0;
   const criticalCount =
     events.data?.filter((e) => e.severity === "critical").length ?? 0;
   const hotspotCount = activeCount; // all demo events recur in zone J18
+
+  const resilienceScore = useMemo(() => {
+    const score = commander.data?.resilience_score;
+    if (score == null) return null;
+    return Math.round(score);
+  }, [commander.data]);
 
   return (
     <div className="flex h-full flex-col gap-4 p-4">
@@ -38,10 +47,10 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Resilience Score"
-          value={recommendations.loading ? "…" : "—"}
+          value={resilienceScore != null ? String(resilienceScore) : "…"}
           icon={Shield}
-          variant="default"
-          hint="Computed in Phase 10"
+          variant={resilienceScore != null && resilienceScore < 35 ? "critical" : "default"}
+          hint="Commander output"
         />
         <StatCard
           label="Recurring Hotspots"
