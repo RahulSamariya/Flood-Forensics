@@ -1,0 +1,26 @@
+1/1
+
+Next.js 15.5.23 (outdated)
+Webpack
+Console Error
+
+
+Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+
+hooks\use-api.ts (31:7) @ useApi.useCallback[refetch]
+
+
+  29 |             ? err.message
+  30 |             : "Unknown error";
+> 31 |       setError(message);
+     |       ^
+  32 |     } finally {
+  33 |       setLoading(false);
+  34 |     }
+Call Stack
+8
+
+Show 7 ignore-listed frame(s)
+useApi.useCallback[refetch]
+hooks\use-api.ts (31:7)
+1

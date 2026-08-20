@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/api";
 
 interface UseApiState<T> {
@@ -15,11 +15,15 @@ export function useApi<T>(fetcher: () => Promise<T>): UseApiState<T> {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Keep the latest fetcher in a ref so refetch stays stable across renders.
+  const fetcherRef = useRef(fetcher);
+  fetcherRef.current = fetcher;
+
   const refetch = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetcher();
+      const result = await fetcherRef.current();
       setData(result);
     } catch (err) {
       const message =
@@ -32,7 +36,7 @@ export function useApi<T>(fetcher: () => Promise<T>): UseApiState<T> {
     } finally {
       setLoading(false);
     }
-  }, [fetcher]);
+  }, []);
 
   useEffect(() => {
     void refetch();

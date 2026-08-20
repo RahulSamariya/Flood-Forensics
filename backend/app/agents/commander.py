@@ -67,6 +67,13 @@ class UrbanResilienceCommander:
         # ------------------------------------------------------------------
         # Run full agent pipeline
         # ------------------------------------------------------------------
+        event = await session.get(FloodEvent, resolved_event)
+        if event is None:
+            return CommanderAnalyzeResponse(
+                status=AgentStatus.FAILED,
+                incident_brief=f"Event {resolved_event} not found.",
+                confidence=0.0,
+            )
         reconstruct = await self._reconstructor.reconstruct(resolved_event, session)
         root_cause = await self._root_cause.analyze(resolved_event, session)
         recurrence = await self._recurrence.analyze(resolved_event, session)
@@ -157,8 +164,9 @@ class UrbanResilienceCommander:
         recurrence_summary = None
         if recurrence.status == AgentStatus.COMPLETED and recurrence.flood_dna:
             dna = recurrence.flood_dna
+            zone = event.zone_id or "unknown"
             recurrence_summary = (
-                f"Zone has flooded {dna.recurrence_count} time(s); "
+                f"Zone {zone} has flooded {dna.recurrence_count} time(s); "
                 f"rainfall threshold ~{dna.rainfall_threshold_mm:.0f} mm/hr; "
                 f"vulnerable: {', '.join(dna.vulnerable_infrastructure) or 'none'}."
             )
@@ -284,16 +292,22 @@ class UrbanResilienceCommander:
 
         normalized = query.lower()
         brief = ""
+        recurrence_summary: str | None = None
+        recommended_intervention: str | None = None
+        primary_cause: str | None = None
         if "recurrence" in normalized or "happened before" in normalized or "again" in normalized:
-            brief = (
+            j18_count = sum(1 for e in events if e.zone_id == "J18")
+            recurrence_summary = (
                 f"Recurring flood zones: {', '.join(sorted(zones))}. "
-                f"Highest recurrence risk is zone J18 with {sum(1 for e in events if e.zone_id == 'J18')} events."
+                f"Highest recurrence risk is zone J18 with {j18_count} events."
             )
+            brief = recurrence_summary
         elif "fix" in normalized or "intervention" in normalized or "priority" in normalized:
-            brief = (
-                "Priority intervention: rehabilitate blocked drains (D142, 71% blockage) "
-                "and schedule biannual desilting for zone J18."
+            recommended_intervention = (
+                "Rehabilitate blocked drains (D142, 71% blockage) and "
+                "schedule biannual desilting for zone J18."
             )
+            brief = f"Priority intervention: {recommended_intervention}"
         elif "resilience" in normalized or "score" in normalized:
             brief = (
                 f"Resilience score for {sum(1 for e in events if e.severity in ('critical', 'high'))} "
@@ -308,6 +322,9 @@ class UrbanResilienceCommander:
         return CommanderAnalyzeResponse(
             status=AgentStatus.COMPLETED,
             incident_brief=brief,
+            primary_cause=primary_cause,
+            recurrence_summary=recurrence_summary,
+            recommended_intervention=recommended_intervention,
             confidence=0.6,
             agent_findings=[],
         )
